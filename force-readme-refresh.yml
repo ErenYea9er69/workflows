@@ -1,0 +1,22 @@
+name: Force README refresh
+
+on:
+  schedule:
+    - cron: '0 * * * *' # runs every hour
+  workflow_dispatch: # allows you to run it manually from GitHub Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update timestamp to trigger GitHub stats refresh
+        run: |
+          echo "last refresh: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" > .readme-refresh
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .readme-refresh
+          git commit -m "chore: auto refresh README" || echo "No changes to commit"
+          git push
